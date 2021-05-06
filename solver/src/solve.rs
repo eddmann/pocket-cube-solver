@@ -1,7 +1,9 @@
 use crate::cube::{Cube, Move};
 use std::collections::{HashMap, VecDeque};
 
-const GODS_NUMBER: usize = 14;
+// 11 moves using half-turn metric,
+// or 14 using the quarter-turn metric
+const GODS_NUMBER: usize = 11;
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 enum Direction {
