@@ -1,4 +1,4 @@
-IMAGE = rust:1.51.0-buster
+IMAGE = eddmann/rust-wasm-pack:r1.51.0-w0.9.1
 DOCKER = docker run --rm -v $(PWD):/app:rw,delegated -w /app
 
 .PHONY: test
@@ -7,7 +7,7 @@ test:
 
 .PHONY: build
 build:
-	$(DOCKER) $(IMAGE) bash -c "cargo install wasm-pack && wasm-pack build"
+	$(DOCKER) $(IMAGE) wasm-pack build
 
 .PHONY: shell
 shell:
