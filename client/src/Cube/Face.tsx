@@ -33,13 +33,41 @@ const createShape = (
   return shape;
 };
 
+type FaceType = 'side' | 'top' | 'front';
+
 type FaceProps = {
   width?: number;
   height?: number;
   radius?: number;
-  type: 'side' | 'top' | 'front';
+  type: FaceType;
   colour: string;
   inverse: boolean;
+};
+
+const calcPosition = (
+  type: FaceType,
+  inverse: boolean
+): { rotX: number; rotY: number; position: Vector3 } => {
+  switch (type) {
+    case 'side':
+      return {
+        rotX: 0,
+        rotY: (inverse ? -1 : 1) * (Math.PI / 2),
+        position: new Vector3(inverse ? -0.5 : 0.5, 0, 0),
+      };
+    case 'top':
+      return {
+        rotX: (inverse ? 1 : -1) * (Math.PI / 2),
+        rotY: 0,
+        position: new Vector3(0, inverse ? -0.5 : 0.5, 0),
+      };
+    case 'front':
+      return {
+        rotX: 0,
+        rotY: Math.PI,
+        position: new Vector3(0, 0, inverse ? -0.5 : 0.5),
+      };
+  }
 };
 
 const Face = ({
@@ -50,33 +78,15 @@ const Face = ({
   inverse,
   colour,
 }: FaceProps) => {
+  const meshRef = useRef<THREE.Mesh>();
+  const geometryRef = useRef<THREE.ShapeBufferGeometry>();
+
   const shape = useMemo(() => createShape(width, height, radius), [
     width,
     height,
     radius,
   ]);
-
-  let rotY = 0;
-  let rotX = 0;
-  const position = new Vector3(0, 0, 0);
-
-  switch (type) {
-    case 'side':
-      rotY = (inverse ? -1 : 1) * (Math.PI / 2);
-      position.setX(inverse ? -0.5 : 0.5);
-      break;
-    case 'top':
-      rotX = (inverse ? 1 : -1) * (Math.PI / 2);
-      position.setY(inverse ? -0.5 : 0.5);
-      break;
-    case 'front':
-      rotY = Math.PI;
-      position.setZ(inverse ? -0.5 : 0.5);
-      break;
-  }
-
-  const meshRef = useRef<THREE.Mesh>();
-  const geometryRef = useRef<THREE.ShapeBufferGeometry>();
+  const { rotX, rotY, position } = calcPosition(type, inverse);
 
   React.useLayoutEffect(() => {
     meshRef.current?.rotateX(rotX);

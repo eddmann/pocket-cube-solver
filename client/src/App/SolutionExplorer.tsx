@@ -1,8 +1,8 @@
 import React from 'react';
-import styles from './App.module.css';
-import { Solution } from './index';
+import styles from './App.module.scss';
+import { Solution } from '../constants';
 
-type SolutionsProps = {
+type SolutionExplorerProps = {
   solution: Solution;
   solutionIdx: number;
   isAutoPlay: boolean;
@@ -10,24 +10,24 @@ type SolutionsProps = {
   onAutoPlay: (enabled: boolean) => void;
 };
 
-const Solutions = ({
+const SolutionExplorer = ({
   solution,
   solutionIdx,
   isAutoPlay,
   onMoveSelection,
   onAutoPlay,
-}: SolutionsProps) => {
+}: SolutionExplorerProps) => {
   if (solution.length === 0) {
     return null;
   }
 
   return (
     <div className={styles.Solution}>
-      {solution.map(([move]: any, idx: number) => (
+      {solution.map(({ move }, idx) => (
         <span
           key={idx}
           className={
-            solutionIdx === idx ? styles.ActiveMove : styles.Move
+            solutionIdx === idx ? styles.MoveActive : styles.Move
           }
           onClick={() => onMoveSelection(idx)}
         >
@@ -46,4 +46,4 @@ const Solutions = ({
   );
 };
 
-export default Solutions;
+export default SolutionExplorer;

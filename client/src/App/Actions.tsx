@@ -1,9 +1,10 @@
 import React from 'react';
-import styles from './App.module.css';
+import { CubeState, CUBE_FACE_COLOURS } from '../constants';
+import styles from './App.module.scss';
 
 type ActionsProps = {
-  state: string;
-  onStateChange: (state: string) => void;
+  state: CubeState;
+  onStateChange: (state: CubeState) => void;
   onRandom: () => void;
   onSolve: () => void;
 };
@@ -14,6 +15,11 @@ const Actions = ({
   onRandom,
   onSolve,
 }: ActionsProps) => {
+  const unknownColours = new RegExp(
+    `[^${Object.keys(CUBE_FACE_COLOURS).join('')}]`,
+    'g'
+  );
+
   return (
     <div className={styles.Actions}>
       <input
@@ -22,7 +28,7 @@ const Actions = ({
         value={(state.match(/.{1,4}/g) || []).join(' ')}
         onChange={e =>
           onStateChange(
-            e.target.value.toUpperCase().replace(/[^WOGRYB]/g, '')
+            e.target.value.toUpperCase().replace(unknownColours, '')
           )
         }
       />

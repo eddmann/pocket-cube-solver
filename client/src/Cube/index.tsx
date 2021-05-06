@@ -5,70 +5,61 @@ import React, {
   forwardRef,
 } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Vector3 } from 'three';
+import { chunk } from 'lodash';
 import Cubie from './Cubie';
-import animate, { Animation } from './animation';
-
-const FACE_SIDES = 3;
-
-const CUBIE_POSITIONS = {
-  DLB: new Vector3(-0.5, -0.5, -0.5),
-  DLF: new Vector3(-0.5, -0.5, 0.5),
-  ULB: new Vector3(-0.5, 0.5, -0.5),
-  ULF: new Vector3(-0.5, 0.5, 0.5),
-  DRB: new Vector3(0.5, -0.5, -0.5),
-  DRF: new Vector3(0.5, -0.5, 0.5),
-  URB: new Vector3(0.5, 0.5, -0.5),
-  URF: new Vector3(0.5, 0.5, 0.5),
-};
-
-// prettier-ignore
-const STATE_LOOKUP = [
-  7, 19, 22, 10, 6, 9, 3, 0, 11, 23, 17, 5,
-  21, 18, 12, 15, 4, 16, 13, 1, 20, 8, 2, 14
-];
-
-const COLOURS = {
-  W: 'white',
-  O: 'orange',
-  G: 'green',
-  R: 'red',
-  Y: 'yellow',
-  B: 'blue',
-};
+import animateRotation, { RotationAnimationStep } from './rotation';
+import {
+  CubePosition,
+  CubeFaceColour,
+  CubeState,
+  CUBIE_POSITIONS,
+  CUBE_FACE_COLOURS,
+  CUBE_STATE_LOOKUP,
+} from '../constants';
 
 type CubeProps = {
-  state: string;
+  state: CubeState;
+} & JSX.IntrinsicElements['group'];
+
+type CubeHandle = {
+  reset: () => void;
+  rotate: (move: string) => Promise<void>;
 };
 
-const Cube = forwardRef<THREE.Group, CubeProps>(({ state }, ref) => {
-  const cubiesRef = useRef<THREE.Mesh[]>([]);
-  const animationRef = useRef<[Animation, () => void]>();
-
-  const stateWithPadding = state.padEnd(24, 'W');
-  const cubieColours = stateWithPadding
-    .split('')
-    .reduce((faces, face, idx) => {
-      // @ts-ignore
-      faces[STATE_LOOKUP[idx]] = COLOURS[face];
+const toCubieColours = (state: CubeState) =>
+  chunk(
+    [...state].reduce((faces: string[], face, idx) => {
+      faces[CUBE_STATE_LOOKUP[idx]] =
+        CUBE_FACE_COLOURS[face as CubeFaceColour];
       return faces;
-    }, []);
+    }, []),
+    3
+  );
+
+const Cube = forwardRef<CubeHandle, CubeProps>(({ state }, ref) => {
+  const cubiesRef = useRef<THREE.Mesh[]>([]);
+  const rotationRef = useRef<
+    | [doStep: RotationAnimationStep, onCompletion: () => void]
+    | undefined
+  >();
+
+  const stateWithPadding: CubeState = state.padEnd(24, 'W');
 
   useFrame(() => {
-    if (!animationRef.current) return;
+    if (!rotationRef.current) return;
 
-    const [animation, onCompletion] = animationRef.current;
+    const [doStep, onCompletion] = rotationRef.current;
 
-    if (!animation.step()) {
+    if (!doStep()) {
       onCompletion();
-      animationRef.current = undefined;
+      rotationRef.current = undefined;
     }
   });
 
   const rotate = (move: string) =>
     new Promise<void>(resolve => {
-      animationRef.current = [
-        animate(cubiesRef.current, move, 1),
+      rotationRef.current = [
+        animateRotation(cubiesRef.current, move, 1),
         resolve,
       ];
     });
@@ -82,25 +73,21 @@ const Cube = forwardRef<THREE.Group, CubeProps>(({ state }, ref) => {
 
   useLayoutEffect(reset, [stateWithPadding]);
 
-  // @ts-ignore
   useImperativeHandle(ref, () => ({ reset, rotate }));
+
+  const cubieColours = toCubieColours(stateWithPadding);
 
   return (
     <group ref={ref}>
       {Object.entries(CUBIE_POSITIONS).map(
         ([name, position], idx) => {
-          const offset = idx * FACE_SIDES;
-          const [side, top, front] = cubieColours.slice(
-            offset,
-            offset + FACE_SIDES
-          );
+          const [side, top, front] = cubieColours[idx];
 
           return (
             <Cubie
               key={name}
-              // @ts-ignore
-              ref={el => (cubiesRef.current[idx] = el)}
-              name={name}
+              ref={el => (cubiesRef.current[idx] = el as THREE.Mesh)}
+              name={name as CubePosition}
               position={position}
               sideColour={side}
               topColour={top}

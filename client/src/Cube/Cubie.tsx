@@ -1,6 +1,7 @@
 import React, { forwardRef } from 'react';
 import { Shape, ExtrudeBufferGeometry, Mesh, Vector3 } from 'three';
 import Face from './Face';
+import { CubePosition } from '../constants';
 
 const eps = 0.00001;
 
@@ -89,7 +90,7 @@ const RoundedBox = forwardRef<Mesh, RoundBoxProps>(
 );
 
 type CubieProps = {
-  name: string;
+  name: CubePosition;
   position: Vector3;
   sideColour: string;
   topColour: string;

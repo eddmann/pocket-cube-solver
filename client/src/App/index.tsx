@@ -2,34 +2,48 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Canvas } from '@react-three/fiber';
 import CameraControls from './CameraControls';
 import Actions from './Actions';
-import Solutions from './Solutions';
+import SolutionExplorer from './SolutionExplorer';
 import Cube from '../Cube';
-import styles from './App.module.css';
-
-const SOLVED_CUBE = 'WWWWOOOOGGGGRRRRYYYYBBBB';
-const SOLVED_MOVE = '🎉';
+import styles from './App.module.scss';
+import {
+  Solver,
+  CubeState,
+  Move,
+  MoveTransition,
+  Solution,
+  SOLVED_CUBE,
+} from '../constants';
 
 type AppProps = {
-  solver: any;
+  solver: Solver;
 };
 
-export type Solution = [
-  move: string,
-  startState: string,
-  endState: string
-][];
-
-const doSolve = (solver: any, state: string): Promise<Solution> => {
+const doSolve = (
+  solver: Solver,
+  state: CubeState
+): Promise<Solution> => {
   try {
     const solution = solver.solve_cube(state);
 
     return Promise.resolve([
-      ...solution.map((move: string, idx: number) => [
-        move,
-        solver.apply_cube_moves(state, solution.slice(0, idx)),
-        solver.apply_cube_moves(state, solution.slice(0, idx + 1)),
-      ]),
-      [SOLVED_MOVE, SOLVED_CUBE, SOLVED_CUBE],
+      ...solution.map(
+        (move: Move, idx): MoveTransition => ({
+          move,
+          startState: solver.apply_cube_moves(
+            state,
+            solution.slice(0, idx)
+          ),
+          endState: solver.apply_cube_moves(
+            state,
+            solution.slice(0, idx + 1)
+          ),
+        })
+      ),
+      {
+        move: '🎉',
+        startState: SOLVED_CUBE,
+        endState: SOLVED_CUBE,
+      },
     ]);
   } catch (error) {
     return Promise.reject(error);
@@ -38,7 +52,7 @@ const doSolve = (solver: any, state: string): Promise<Solution> => {
 
 const App = ({ solver }: AppProps) => {
   const cubeRef = useRef<any>();
-  const [state, setState] = useState(SOLVED_CUBE);
+  const [state, setState] = useState<CubeState>(SOLVED_CUBE);
   const [solution, setSolution] = useState<Solution>([]);
   const [solutionIdx, setSolutionIdx] = useState(0);
   const [isAutoPlay, setAutoPlay] = useState(true);
@@ -48,8 +62,8 @@ const App = ({ solver }: AppProps) => {
     if (!solution[solutionIdx]) return;
     if (!isAutoPlay) return;
 
-    const [move, , endState] = solution[solutionIdx];
-    if (move === SOLVED_MOVE) return;
+    const { move, startState, endState } = solution[solutionIdx];
+    if (startState === SOLVED_CUBE) return;
 
     let isActiveAnimation = true;
 
@@ -90,7 +104,7 @@ const App = ({ solver }: AppProps) => {
   };
 
   const handleMoveSelection = (idx: number) => {
-    const [, startState] = solution[idx];
+    const { startState } = solution[idx];
     setState(startState);
     setSolutionIdx(idx);
   };
@@ -114,7 +128,7 @@ const App = ({ solver }: AppProps) => {
         <CameraControls />
         <Cube ref={cubeRef} state={state} />
       </Canvas>
-      <Solutions
+      <SolutionExplorer
         solution={solution}
         solutionIdx={solutionIdx}
         isAutoPlay={isAutoPlay}
