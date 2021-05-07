@@ -15,7 +15,7 @@ export type CubePosition =
   | 'URF';
 
 export const CUBE_FACE_COLOURS = {
-  W: 'white',
+  W: '#f7f5f5',
   O: 'orange',
   G: 'green',
   R: 'red',

@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Canvas } from '@react-three/fiber';
+import { NoToneMapping } from 'three';
 import CameraControls from './CameraControls';
 import Actions from './Actions';
 import SolutionExplorer from './SolutionExplorer';
@@ -121,6 +122,9 @@ const App = ({ solver }: AppProps) => {
         onSolve={handleSolve}
       />
       <Canvas
+        onCreated={({ gl }) => {
+          gl.toneMapping = NoToneMapping;
+        }}
         className={styles.Canvas}
         camera={{ position: [4, 4, 5] }}
         gl={{ antialias: true }}
