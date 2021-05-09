@@ -19,13 +19,19 @@ pub fn rand_cube() -> String {
 #[wasm_bindgen]
 pub fn solve_cube(cube: String) -> Result<js_sys::Array, JsValue> {
     match solve(&cube.parse()?) {
-        Some(solution) => Ok(solution.into_iter().map(|x| JsValue::from_str(&format!("{}", x))).collect::<js_sys::Array>()),
-        None => Err(JsValue::from_str("Cube is unsolveable"))
+        Some(solution) => Ok(solution
+            .into_iter()
+            .map(|mv| JsValue::from_str(&format!("{}", mv)))
+            .collect::<js_sys::Array>()),
+        None => Err(JsValue::from_str("Cube is unsolveable")),
     }
 }
 
 #[wasm_bindgen]
 pub fn apply_cube_moves(cube: String, moves: js_sys::Array) -> Result<String, JsValue> {
-    let actions: Vec<Move> = moves.iter().map(|m| (m.as_string().unwrap_or("".to_string())).parse()).collect::<Result<Vec<_>, _>>()?;
+    let actions: Vec<Move> = moves
+        .iter()
+        .map(|mv| (mv.as_string().unwrap_or("".to_string())).parse())
+        .collect::<Result<Vec<_>, _>>()?;
     Ok(cube.parse::<Cube>()?.apply_moves(actions).to_string())
 }

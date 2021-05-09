@@ -81,7 +81,7 @@ mod tests {
 
     #[test]
     fn solve_random_cube() {
-        let cube = Cube::random(100);
+        let cube = Cube::random(15);
         let solution = solve(&cube);
         assert_eq!(Cube::solved(), cube.apply_moves(solution.unwrap()));
     }
