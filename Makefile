@@ -4,6 +4,10 @@ build:
 	make client/install
 	make client/build
 
+.PHONY: test
+test:
+	make solver/test
+
 client/%:
 	(cd client; make $*)
 
