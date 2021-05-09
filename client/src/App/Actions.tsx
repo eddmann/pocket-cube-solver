@@ -1,5 +1,5 @@
 import React from 'react';
-import { CubeState, CUBE_FACE_COLOURS } from '../constants';
+import { CubeState, CUBE_FACELET_COLOURS } from '../constants';
 import styles from './App.module.scss';
 
 type ActionsProps = {
@@ -16,7 +16,7 @@ const Actions = ({
   onSolve,
 }: ActionsProps) => {
   const unknownColours = new RegExp(
-    `[^${Object.keys(CUBE_FACE_COLOURS).join('')}]`,
+    `[^${Object.keys(CUBE_FACELET_COLOURS).join('')}]`,
     'g'
   );
 

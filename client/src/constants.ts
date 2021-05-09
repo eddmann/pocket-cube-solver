@@ -14,7 +14,7 @@ export type CubePosition =
   | 'URB'
   | 'URF';
 
-export const CUBE_FACE_COLOURS = {
+export const CUBE_FACELET_COLOURS = {
   W: '#f7f5f5',
   O: 'orange',
   G: 'green',
@@ -23,7 +23,7 @@ export const CUBE_FACE_COLOURS = {
   B: 'blue',
 };
 
-export type CubeFaceColour = keyof typeof CUBE_FACE_COLOURS;
+export type CubeFaceletColour = keyof typeof CUBE_FACELET_COLOURS;
 
 export type Move = string;
 

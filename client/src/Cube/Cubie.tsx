@@ -1,6 +1,6 @@
 import React, { forwardRef } from 'react';
 import { Shape, ExtrudeBufferGeometry, Mesh, Vector3 } from 'three';
-import Face from './Face';
+import Facelet from './Facelet';
 import { CubePosition } from '../constants';
 
 const eps = 0.00001;
@@ -92,13 +92,13 @@ const RoundedBox = forwardRef<Mesh, RoundBoxProps>(
 type CubieProps = {
   name: CubePosition;
   position: Vector3;
-  sideColour: string;
-  topColour: string;
-  frontColour: string;
+  yColour: string;
+  xColour: string;
+  zColour: string;
 };
 
 const Cubie = forwardRef<Mesh, CubieProps>(
-  ({ name, position, sideColour, topColour, frontColour }, ref) => {
+  ({ name, position, yColour, xColour, zColour }, ref) => {
     return (
       <RoundedBox
         ref={ref}
@@ -109,21 +109,9 @@ const Cubie = forwardRef<Mesh, CubieProps>(
         userData={{ name, position }}
       >
         <meshBasicMaterial color={0x000000} />
-        <Face
-          type="side"
-          inverse={position.x < 0}
-          colour={sideColour}
-        />
-        <Face
-          type="top"
-          inverse={position.y < 0}
-          colour={topColour}
-        />
-        <Face
-          type="front"
-          inverse={position.z < 0}
-          colour={frontColour}
-        />
+        <Facelet axis="y" inverse={position.x < 0} colour={yColour} />
+        <Facelet axis="x" inverse={position.y < 0} colour={xColour} />
+        <Facelet axis="z" inverse={position.z < 0} colour={zColour} />
       </RoundedBox>
     );
   }

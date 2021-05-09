@@ -10,10 +10,10 @@ import Cubie from './Cubie';
 import animateRotation, { RotationAnimationStep } from './rotation';
 import {
   CubePosition,
-  CubeFaceColour,
+  CubeFaceletColour,
   CubeState,
   CUBIE_POSITIONS,
-  CUBE_FACE_COLOURS,
+  CUBE_FACELET_COLOURS,
   CUBE_STATE_LOOKUP,
 } from '../constants';
 
@@ -30,7 +30,7 @@ const toCubieColours = (state: CubeState) =>
   chunk(
     [...state].reduce((faces: string[], face, idx) => {
       faces[CUBE_STATE_LOOKUP[idx]] =
-        CUBE_FACE_COLOURS[face as CubeFaceColour];
+        CUBE_FACELET_COLOURS[face as CubeFaceletColour];
       return faces;
     }, []),
     3
@@ -81,7 +81,7 @@ const Cube = forwardRef<CubeHandle, CubeProps>(({ state }, ref) => {
     <group ref={ref}>
       {Object.entries(CUBIE_POSITIONS).map(
         ([name, position], idx) => {
-          const [side, top, front] = cubieColours[idx];
+          const [yColour, xColour, zColour] = cubieColours[idx];
 
           return (
             <Cubie
@@ -89,9 +89,9 @@ const Cube = forwardRef<CubeHandle, CubeProps>(({ state }, ref) => {
               ref={el => (cubiesRef.current[idx] = el as THREE.Mesh)}
               name={name as CubePosition}
               position={position}
-              sideColour={side}
-              topColour={top}
-              frontColour={front}
+              yColour={yColour}
+              xColour={xColour}
+              zColour={zColour}
             />
           );
         }

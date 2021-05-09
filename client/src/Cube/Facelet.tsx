@@ -33,35 +33,35 @@ const createShape = (
   return shape;
 };
 
-type FaceType = 'side' | 'top' | 'front';
+type FaceletAxis = 'x' | 'y' | 'z';
 
-type FaceProps = {
+type FaceletProps = {
   width?: number;
   height?: number;
   radius?: number;
-  type: FaceType;
+  axis: FaceletAxis;
   colour: string;
   inverse: boolean;
 };
 
 const calcPosition = (
-  type: FaceType,
+  axis: FaceletAxis,
   inverse: boolean
 ): { rotX: number; rotY: number; position: Vector3 } => {
-  switch (type) {
-    case 'side':
+  switch (axis) {
+    case 'y':
       return {
         rotX: 0,
         rotY: (inverse ? -1 : 1) * (Math.PI / 2),
         position: new Vector3(inverse ? -0.5 : 0.5, 0, 0),
       };
-    case 'top':
+    case 'x':
       return {
         rotX: (inverse ? 1 : -1) * (Math.PI / 2),
         rotY: 0,
         position: new Vector3(0, inverse ? -0.5 : 0.5, 0),
       };
-    case 'front':
+    case 'z':
       return {
         rotX: 0,
         rotY: Math.PI,
@@ -70,14 +70,14 @@ const calcPosition = (
   }
 };
 
-const Face = ({
+const Facelet = ({
   width = 0.88,
   height = 0.88,
   radius = 0,
-  type,
+  axis,
   inverse,
   colour,
-}: FaceProps) => {
+}: FaceletProps) => {
   const meshRef = useRef<THREE.Mesh>();
   const geometryRef = useRef<THREE.ShapeBufferGeometry>();
 
@@ -86,7 +86,7 @@ const Face = ({
     height,
     radius,
   ]);
-  const { rotX, rotY, position } = calcPosition(type, inverse);
+  const { rotX, rotY, position } = calcPosition(axis, inverse);
 
   React.useLayoutEffect(() => {
     meshRef.current?.rotateX(rotX);
@@ -113,4 +113,4 @@ const Face = ({
   );
 };
 
-export default Face;
+export default Facelet;
